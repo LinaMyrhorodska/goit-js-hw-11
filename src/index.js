@@ -57,7 +57,7 @@ function onClickMore() {
         onRenderList(foundData.hits);
       }
       loadMoreBtn.style.display = 'block';
-    }) 
+    }).catch((error) => console.log(error.response.data))
 };
 
 function onClean() {
