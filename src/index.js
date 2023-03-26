@@ -45,19 +45,19 @@ function onBtnSubmit(e)  {
 }
 
 function onClickMore() {
+  if (!onFetch) return; 
   numberPage++;
   const valueTrim = input.value.trim();
   loadMoreBtn.style.display = 'none';
   onFetch(valueTrim, numberPage)
     .then(foundData => {
-      
-      if (foundData.hits.length < 40) {
+      if (galery.children.length >= foundData.totalHits) {
         Notify.info('Sorry, but you have reached the end of search results.');
       } else {
         onRenderList(foundData.hits);
       }
       loadMoreBtn.style.display = 'block';
-    }).catch((error) => console.log(error.response.data))
+    }).catch((error) => console.log(error))
 };
 
 function onClean() {
