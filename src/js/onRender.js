@@ -1,3 +1,7 @@
+import simpleLightbox from "simplelightbox";
+import 'simplelightbox/dist/simple-lightbox.min.css';
+
+
 export function onRenderList(images) {
     const galery = document.querySelector('.gallery');
       console.log(images, 'images');
@@ -24,5 +28,10 @@ export function onRenderList(images) {
 </div>`;
     }).join('')
     galery.innerHTML += markupImg;
-    
+  simpleLightBox.refresh();
 }
+
+const simpleLightBox = new simpleLightbox('.gallery a', {
+  captionsData: 'alt',
+  captionDelay: 250,
+});
