@@ -50,8 +50,9 @@ function onClickMore() {
   loadMoreBtn.style.display = 'none';
   onFetch(valueTrim, numberPage)
     .then(foundData => {
+      
       if (foundData.hits.length < 40) {
-        Notify.info('Sorry, but you have reached the end of search results.')
+        return Notify.info('Sorry, but you have reached the end of search results.');
       } else {
         onRenderList(foundData.hits);
       }
