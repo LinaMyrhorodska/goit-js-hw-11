@@ -52,7 +52,7 @@ function onClickMore() {
     .then(foundData => {
       
       if (foundData.hits.length < 40) {
-        return Notify.info('Sorry, but you have reached the end of search results.');
+        Notify.info('Sorry, but you have reached the end of search results.');
       } else {
         onRenderList(foundData.hits);
       }
