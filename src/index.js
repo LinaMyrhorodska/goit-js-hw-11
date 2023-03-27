@@ -2,10 +2,9 @@ import  onFetch  from './js/fetch.js';
 import SimpleLightbox from 'simplelightbox';
 import { Notify } from 'notiflix/build/notiflix-notify-aio';
 import 'simplelightbox/dist/simple-lightbox.min.css';
-import { onRenderList } from './js/onRender.js';
+
 import { ProgressBar } from 'react-loader-spinner';
 
-// const form = document.querySelector('.search-form');
 let numberPage = 1;
 const galery = document.querySelector('.gallery');
 const searchBtn = document.querySelector('.search-btn');
@@ -18,49 +17,70 @@ let gallerySimpleLightbox = new SimpleLightbox('.gallery a');
 searchBtn.addEventListener('click', onBtnSubmit);
 loadMoreBtn.addEventListener('click', onClickMore);
 
-function onBtnSubmit(e)  {
+async function onBtnSubmit(e)  {
   e.preventDefault();
   onClean();
-  
-  const valueTrim = input.value.trim();
-  if (valueTrim !== '') {
-  onFetch(valueTrim, numberPage)
-    .then(foundData => {
-      const totalHits = foundData.totalHits;
-      if (foundData.hits.length === 0) {
-        Notify.failure(
-          'Sorry, there are no images matching your search query. Please try again.'
-        );
-      } else {
-        onRenderList(foundData.hits);
-        Notify.success(
-          `Hooray! We found ${totalHits} images.`
-        );
-        loadMoreBtn.style.display = 'block';
-                
-      }
-    })
-}
-
-}
+  const name = input.value.trim();
+   if (name !== '') {
+    const data = await onFetch(name);
+    createItems(data);
+  } else {
+    loadMoreBtn.style.display = 'none';
+    return Notify.failure(
+      'Sorry, there are no images matching your search query. Please try again.'
+    );
+  }
+};
 
 async function onClickMore() {
-  if (!onFetch) return; 
-  numberPage++;
-  const valueTrim = input.value.trim();
-  loadMoreBtn.style.display = 'none';
-  const data = await onFetch(value, page);
-  onRenderList(data, true);
-  // onFetch(valueTrim, numberPage)
-  //   .then(foundData => {
-  //     if (foundData.hits >= Math.ceil(foundData.totalHits / 40)) {
-  //       Notify.info('Sorry, but you have reached the end of search results.');
-  //     } else {
-  //       onRenderList(foundData.hits);
-  //     }
-  //     loadMoreBtn.style.display = 'block';
-  //   }).catch((error) => console.log(error))
+  const name = input.value.trim();
+  numberPage += 1;
+  const data = await onFetch(name, numberPage);
+  createItems(data, true);
 };
+
+export function createItems(photos, append = false) {
+  const markup = photos.hits
+    .map(
+      ({
+        webformatURL,
+        largeImageURL,
+        tags,
+        likes,
+        views,
+        comments,
+        downloads,
+      }) => `<div class="photo-card">
+  <a href="${largeImageURL}"><img src="${webformatURL}" alt="${tags}" loading="lazy" /></a>
+   <div class="info">
+     <p class="info-item">
+       <b>Likes:${likes}</b>
+     </p>
+     <p class="info-item">
+       <b>Views:${views}</b>
+     </p>
+     <p class="info-item">
+       <b>Comments:${comments}</b>
+     </p>
+     <p class="info-item">
+       <b>Downloads:${downloads}</b>
+     </p>
+   </div>
+ </div>`
+    )
+    .join('');
+  if (append) {
+    galery.insertAdjacentHTML('beforeend', markup);
+  } else {
+    galery.innerHTML = markup;
+  }
+  simpleLightbox.refresh();
+};
+
+const simpleLightbox = new SimpleLightbox('.gallery a', {
+  captionsData: 'alt',
+  captionDelay: 250,
+});
 
 function onClean() {
   numberPage = 1;
@@ -111,13 +131,14 @@ export function Notification(length, totalHits) {
       'Sorry, there are no images matching your search query. Please try again.'
     );
     return;
-  } else if (page === 1) {
-    refs.btnloadMore.style.display = 'flex';
+  } else if (numberPage === 1) {
+    loadMoreBtn.style.display = 'block';
 
     Notify.success(`Hooray! We found ${totalHits} images.`);
-  } else if (page >= Math.ceil(totalHits / 40)) {
-    refs.btnloadMore.style.display = 'none';
+  } else if (numberPage >= Math.ceil(totalHits / 40)) {
+    loadMoreBtn.style.display = 'none';
     Notify.info("We're sorry, but you've reached the end of search results.");
   }
 }
+
 

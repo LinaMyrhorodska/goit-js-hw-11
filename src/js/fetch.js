@@ -1,21 +1,26 @@
 import axios from 'axios';
-import { Notification } from '../index';
+import { Notification } from '../index.js';
 
 
-export default async function onFetch(value, page) {
+export default async function onFetch(name, page) {
     const url = 'https://pixabay.com/api/';
-    const key = '34575125-34d98c7bc370876af411504a6';
-    const filters = `?key=${key}&q=${value}&image_type=photo&orientation=horizontal&safesearch=true&per_page=40&page=${page}`;
+     const options = {
+    params: {
+      key: '34575125-34d98c7bc370876af411504a6',
+      q: name,
+      image_type: 'photo',
+      orientation: 'horizontal',
+      safesearch: 'true',
+      page: page,
+      per_page: 40,
+    },
+  };
+  try {
+    const response = await axios.get(url, options);
+    Notification(response.data.hits.length, response.data.totalHits);
 
-    try {
-        const res = await axios.get(`${url}${filters}`);
-        Notification(res.data.hits.length, res.data.totalHits);
-        return res.data;
-
-    } catch (error) {
-        console.log(`Error: ${error?.response?.data}`);
-    }
-
-  
-
+    return response.data;
+  } catch (error) {
+    console.log(error);
+  }
 }
