@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { Notification } from '../index';
 
 
 export default async function onFetch(value, page) {
@@ -8,6 +9,7 @@ export default async function onFetch(value, page) {
 
     try {
         const res = await axios.get(`${url}${filters}`);
+        Notification(res.data.hits.length, res.data.totalHits);
         return res.data;
 
     } catch (error) {

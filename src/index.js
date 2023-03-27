@@ -44,20 +44,22 @@ function onBtnSubmit(e)  {
 
 }
 
-function onClickMore() {
+async function onClickMore() {
   if (!onFetch) return; 
   numberPage++;
   const valueTrim = input.value.trim();
   loadMoreBtn.style.display = 'none';
-  onFetch(valueTrim, numberPage)
-    .then(foundData => {
-      if (galery.children.length >= foundData.totalHits) {
-        Notify.info('Sorry, but you have reached the end of search results.');
-      } else {
-        onRenderList(foundData.hits);
-      }
-      loadMoreBtn.style.display = 'block';
-    }).catch((error) => console.log(error))
+  const data = await onFetch(value, page);
+  onRenderList(data, true);
+  // onFetch(valueTrim, numberPage)
+  //   .then(foundData => {
+  //     if (foundData.hits >= Math.ceil(foundData.totalHits / 40)) {
+  //       Notify.info('Sorry, but you have reached the end of search results.');
+  //     } else {
+  //       onRenderList(foundData.hits);
+  //     }
+  //     loadMoreBtn.style.display = 'block';
+  //   }).catch((error) => console.log(error))
 };
 
 function onClean() {
@@ -103,4 +105,19 @@ window.onload = () => {
 
 };
 
+export function Notification(length, totalHits) {
+  if (length === 0) {
+    Notify.failure(
+      'Sorry, there are no images matching your search query. Please try again.'
+    );
+    return;
+  } else if (page === 1) {
+    refs.btnloadMore.style.display = 'flex';
+
+    Notify.success(`Hooray! We found ${totalHits} images.`);
+  } else if (page >= Math.ceil(totalHits / 40)) {
+    refs.btnloadMore.style.display = 'none';
+    Notify.info("We're sorry, but you've reached the end of search results.");
+  }
+}
 

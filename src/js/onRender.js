@@ -2,7 +2,7 @@ import simpleLightbox from "simplelightbox";
 import 'simplelightbox/dist/simple-lightbox.min.css';
 
 
-export function onRenderList(images) {
+export function onRenderList(images, append = false) {
     const galery = document.querySelector('.gallery');
       console.log(images, 'images');
     const markupImg = images.map(image => {
